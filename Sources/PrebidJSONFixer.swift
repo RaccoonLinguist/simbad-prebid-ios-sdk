@@ -66,7 +66,7 @@ class PrebidJSONFixerProtocol: URLProtocol, URLSessionDataDelegate {
     }
 }
 
-// УЛЬТИМАТИВНЫЙ ПЕРЕХВАТЧИК (Ловит Objective-C инициализаторы)
+// ПЕРЕХВАТЧИК Ловит Objective-C инициализаторы
 extension URLSession {
     private static var isSwizzled = false
     
