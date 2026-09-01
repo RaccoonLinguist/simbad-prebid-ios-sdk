@@ -7,11 +7,10 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
         // ВАЖНО: Теперь мы вызываем метод у URLSession (а не URLSessionConfiguration)
         URLSession.enablePrebidJSONFixer()
         
-        // 1. Указываем ваш Account ID
-        // ... остальной код ...
+        // 1. Указываем ваш Account ID - ВМЕСТО 273000419 НУЖНО УКАЗАТЬ ТОТ, КОТОРЫЙ ВЫ ПОЛУЧИТЕ ОТ МЕНЕДЖЕРА SIMB-AD
         Prebid.shared.prebidServerAccountId = "273000419"
         
-        // 2. Указываем Stored Request ID для аукциона
+        // 2. Указываем Stored Request ID для аукциона - НЕ МЕНЯТЬ
         Prebid.shared.storedAuctionResponse = "0689a263-318d-448b-a3d4-b02e8a709d9d"
         
         // 3. Вызываем инициализацию безопасно
