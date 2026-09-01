@@ -32,7 +32,7 @@ struct PrebidBannerView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // В данном случае обновление view не требуется
+        // По необходимости можно обновить view, например, при splitscreen или смене ориентации portrait/landscape
     }
     
     func makeCoordinator() -> Coordinator {
