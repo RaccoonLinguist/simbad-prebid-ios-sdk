@@ -17,4 +17,4 @@ This is repacked Prebid Mobile iOS SDK with fixed core files for Simb-AD.com
 ####################################################################################
 
 
-View coments in /Sources/ for additional info.
+View comments in /Sources/ for additional info.
