@@ -18,20 +18,26 @@ class PrebidJSONFixerProtocol: URLProtocol, URLSessionDataDelegate {
     }
 
     // 2. Перехватываем и модифицируем ИСХОДЯЩИЙ запрос перед отправкой
-    override func startLoading() {
+override func startLoading() {
         guard let mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest else { return }
         URLProtocol.setProperty(true, forKey: "PrebidJSONFixerHandled", in: mutableRequest)
         
         // ==========================================
-        // ПАТЧ ИСХОДЯЩЕГО ЗАПРОСА (Без жестких размеров)
+        // ПАТЧ ЗАГОЛОВКОВ
+        // ==========================================
+        // Удаляем служебный заголовок Prebid, который убивает выдачу рекламы на Xoalt
+        mutableRequest.setValue(nil, forHTTPHeaderField: "PBMIsPBMRequest")
+        
+        // ==========================================
+        // ПАТЧ ИСХОДЯЩЕГО JSON (Оставляем проверенный рабочий вариант)
         // ==========================================
         if let httpBody = mutableRequest.httpBody,
            var jsonDict = try? JSONSerialization.jsonObject(with: httpBody, options: []) as? [String: Any] {
             
-            // Вырезаем массив "places", из-за которого сервер возвращает ошибку
+            // Вырезаем массив places
             jsonDict.removeValue(forKey: "places")
             
-            // Вырезаем конфликтующий глобальный storedrequest в корне ext
+            // Вырезаем глобальный storedrequest
             if var ext = jsonDict["ext"] as? [String: Any],
                var prebid = ext["prebid"] as? [String: Any] {
                 prebid.removeValue(forKey: "storedrequest")
@@ -39,7 +45,6 @@ class PrebidJSONFixerProtocol: URLProtocol, URLSessionDataDelegate {
                 jsonDict["ext"] = ext
             }
             
-            // Упаковываем вычищенный JSON обратно в запрос
             if let patchedData = try? JSONSerialization.data(withJSONObject: jsonDict, options: []) {
                 mutableRequest.httpBody = patchedData
                 mutableRequest.setValue("\(patchedData.count)", forHTTPHeaderField: "Content-Length")
@@ -47,7 +52,6 @@ class PrebidJSONFixerProtocol: URLProtocol, URLSessionDataDelegate {
         }
         // ==========================================
         
-        // Создаем сессию, исключая наш перехватчик, чтобы запрос реально ушел в сеть
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = config.protocolClasses?.filter { $0 != PrebidJSONFixerProtocol.self }
         
@@ -55,7 +59,6 @@ class PrebidJSONFixerProtocol: URLProtocol, URLSessionDataDelegate {
         dataTask = session.dataTask(with: mutableRequest as URLRequest)
         dataTask?.resume()
     }
-
     override func stopLoading() {
         dataTask?.cancel()
         dataTask = nil
